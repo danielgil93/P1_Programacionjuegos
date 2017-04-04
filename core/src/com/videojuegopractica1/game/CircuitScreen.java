@@ -1,9 +1,13 @@
 package com.videojuegopractica1.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import java.util.ArrayList;
@@ -18,6 +22,8 @@ public class CircuitScreen extends Screen {
     Stage stage;
     RoadActor[] roadActor;
     GrassActor[] grassActor;
+    CarActor carActor;
+    float speed = 5;
 
     public CircuitScreen(final Game game){
         super(game);
@@ -43,6 +49,22 @@ public class CircuitScreen extends Screen {
                 }
             }
         }
+        carActor = new CarActor();
+        stage.addActor(carActor);
+        stage.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Gdx.app.log("tocado", String.valueOf(x));
+                if(x<0)
+                    carActor.rotateBy(15f);
+                else
+                    carActor.rotateBy(-15f);
+                return false;
+            }
+
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                Gdx.app.log("Example", "touch done at (" + x + ", " + y + ")");
+            }
+        });
     }
 
     private ArrayList<Vector2> getPosiciones (){
@@ -89,9 +111,38 @@ public class CircuitScreen extends Screen {
     @Override
     public void render(float delta) {
         super.render(delta);
+        inputManager(delta);
+        stage.getCamera().position.set(carActor.getX(),carActor.getY(),0);
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.draw();
         stage.act(delta);
+    }
+
+    private void inputManager(float delta){
+
+        //float acceleration=Gdx.input.getAccelerometerY();
+        //carActor.rotateBy(1f*acceleration);
+
+
+
+        float velocity = 1f; // Your desired velocity of the car.
+        float angle = (float) ((carActor.getRotation()*Math.PI/180)+(Math.PI/2)); // Body angle in radians.
+
+        //Gdx.app.log("angle", String.valueOf(angle));
+
+        float velX = MathUtils.cos(angle) * velocity; // X-component.
+        float velY = MathUtils.sin(angle) * velocity; // Y-component.
+
+        //Gdx.app.log("x", String.valueOf(velX));
+       // Gdx.app.log("y", String.valueOf(velY));
+
+        carActor.moveBy(velX,velY);
+    }
+
+    @Override
+    public void show() {
+        super.show();
+        Gdx.input.setInputProcessor(stage);
     }
 }
