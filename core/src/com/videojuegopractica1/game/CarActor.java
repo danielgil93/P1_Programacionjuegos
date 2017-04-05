@@ -20,7 +20,7 @@ public class CarActor extends Actor implements Disposable{
         setY(0);
         setSize(71, 116);
         setScale(Gdx.graphics.getDensity());
-        setOrigin(0, 0);
+        setOrigin(getWidth()/2, getHeight()/2);
     }
 
     @Override

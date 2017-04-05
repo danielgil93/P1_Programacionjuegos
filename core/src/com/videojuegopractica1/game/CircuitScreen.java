@@ -2,10 +2,12 @@ package com.videojuegopractica1.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -53,11 +55,11 @@ public class CircuitScreen extends Screen {
         stage.addActor(carActor);
         stage.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Gdx.app.log("tocado", String.valueOf(x));
+                /*Gdx.app.log("tocado", String.valueOf(x));
                 if(x<0)
                     carActor.rotateBy(15f);
                 else
-                    carActor.rotateBy(-15f);
+                    carActor.rotateBy(-15f);*/
                 return false;
             }
 
@@ -121,12 +123,13 @@ public class CircuitScreen extends Screen {
 
     private void inputManager(float delta){
 
-        //float acceleration=Gdx.input.getAccelerometerY();
-        //carActor.rotateBy(1f*acceleration);
+        float acceleration=Gdx.input.getAccelerometerY();
+        carActor.rotateBy(-0.5f*acceleration);
+        stage.getCamera().rotate(new Vector3(0,0,1),-0.5f*acceleration);
 
 
 
-        float velocity = 1f; // Your desired velocity of the car.
+        float velocity = 10f; // Your desired velocity of the car.
         float angle = (float) ((carActor.getRotation()*Math.PI/180)+(Math.PI/2)); // Body angle in radians.
 
         //Gdx.app.log("angle", String.valueOf(angle));
