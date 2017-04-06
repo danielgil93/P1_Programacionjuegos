@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -13,6 +14,7 @@ import com.badlogic.gdx.utils.Disposable;
 
 public class GrassActor extends Actor implements Disposable{
     private Texture road;
+    Rectangle bounds;
 
     public GrassActor(){
         road = new Texture("grass.png");
@@ -21,6 +23,7 @@ public class GrassActor extends Actor implements Disposable{
         setOrigin(0, 0);
         setSize(128*2, 128*2);
         setScale(Gdx.graphics.getDensity());
+        bounds = new Rectangle(0,0,getWidth(),getHeight());
     }
 
     @Override
@@ -39,4 +42,6 @@ public class GrassActor extends Actor implements Disposable{
     public void dispose() {
         road.dispose();
     }
+
+    public Rectangle getBounds(){return bounds;};
 }

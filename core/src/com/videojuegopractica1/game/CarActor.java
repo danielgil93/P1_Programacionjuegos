@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -13,6 +14,7 @@ import com.badlogic.gdx.utils.Disposable;
 
 public class CarActor extends Actor implements Disposable{
     private Texture car;
+    public Rectangle bounds;
 
     public CarActor(){
         car = new Texture("car.png");
@@ -21,6 +23,7 @@ public class CarActor extends Actor implements Disposable{
         setSize(71, 116);
         setScale(Gdx.graphics.getDensity());
         setOrigin(getWidth()/2, getHeight()/2);
+        //bounds = new Rectangle(getX(),getY(),getWidth(),getHeight());
     }
 
     @Override
@@ -39,4 +42,6 @@ public class CarActor extends Actor implements Disposable{
     public void dispose() {
         car.dispose();
     }
+
+    public Rectangle getBounds(){return bounds;};
 }

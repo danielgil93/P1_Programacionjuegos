@@ -5,7 +5,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -26,6 +28,9 @@ public class CircuitScreen extends Screen {
     GrassActor[] grassActor;
     CarActor carActor;
     float speed = 5;
+
+    float MIN_SPEED=2f;
+    float MAX_SPEED=10f;
 
     public CircuitScreen(final Game game){
         super(game);
@@ -53,6 +58,12 @@ public class CircuitScreen extends Screen {
         }
         carActor = new CarActor();
         stage.addActor(carActor);
+        carActor.bounds=new Rectangle(stage.getCamera().position.x+carActor.getX(),
+                stage.getCamera().position.y+carActor.getY(),
+                carActor.getWidth()*carActor.getScaleX(),
+                carActor.getScaleY()*carActor.getHeight());
+        //carActor.setPosition(128*Gdx.graphics.getDensity()*4+64*Gdx.graphics.getDensity(),
+          //      128*Gdx.graphics.getDensity()*2+64*Gdx.graphics.getDensity());
         stage.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 /*Gdx.app.log("tocado", String.valueOf(x));
@@ -113,12 +124,32 @@ public class CircuitScreen extends Screen {
     @Override
     public void render(float delta) {
         super.render(delta);
-        inputManager(delta);
-        stage.getCamera().position.set(carActor.getX(),carActor.getY(),0);
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.draw();
         stage.act(delta);
+        inputManager(delta);
+        stage.getCamera().position.set(carActor.getX(),carActor.getY(),0);
+        for(int i=0;i < stage.getActors().size;i++){
+            if(stage.getActors().get(i).getClass()==GrassActor.class) {
+                GrassActor grassActor=(GrassActor) stage.getActors().get(i);
+                if (carActor.getBounds().overlaps(grassActor.getBounds())) {
+                    speed=MIN_SPEED;
+                    Gdx.app.log("estado","hierba");
+                    break;
+                }
+                else {
+                    speed = MAX_SPEED;
+                    Gdx.app.log("estado","carretera");
+                }
+            }
+        }
+        ShapeRenderer shapeRenderer=new ShapeRenderer();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(1, 0, 0, 1);
+        shapeRenderer.rect(carActor.getBounds().x, carActor.getBounds().y,
+                carActor.getBounds().width, carActor.getBounds().height);
+        shapeRenderer.end();
     }
 
     private void inputManager(float delta){
@@ -128,14 +159,12 @@ public class CircuitScreen extends Screen {
         stage.getCamera().rotate(new Vector3(0,0,1),-0.5f*acceleration);
 
 
-
-        float velocity = 10f; // Your desired velocity of the car.
-        float angle = (float) ((carActor.getRotation()*Math.PI/180)+(Math.PI/2)); // Body angle in radians.
+float angle = (float) ((carActor.getRotation()*Math.PI/180)+(Math.PI/2)); // Body angle in radians.
 
         //Gdx.app.log("angle", String.valueOf(angle));
 
-        float velX = MathUtils.cos(angle) * velocity; // X-component.
-        float velY = MathUtils.sin(angle) * velocity; // Y-component.
+        float velX = MathUtils.cos(angle) * speed; // X-component.
+        float velY = MathUtils.sin(angle) * speed; // Y-component.
 
         //Gdx.app.log("x", String.valueOf(velX));
        // Gdx.app.log("y", String.valueOf(velY));
