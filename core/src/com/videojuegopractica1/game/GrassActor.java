@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.utils.Disposable;
 public class GrassActor extends Actor implements Disposable{
     private Texture road;
     Rectangle bounds;
+    public Polygon polygon;
 
     public GrassActor(){
         road = new Texture("grass.png");
@@ -22,8 +24,8 @@ public class GrassActor extends Actor implements Disposable{
         setY(0);
         setOrigin(0, 0);
         setSize(128*2, 128*2);
-        setScale(Gdx.graphics.getDensity());
-        bounds = new Rectangle(0,0,getWidth(),getHeight());
+        bounds = new Rectangle(getX(),getY(),getWidth(),getHeight());
+
     }
 
     @Override
@@ -44,4 +46,14 @@ public class GrassActor extends Actor implements Disposable{
     }
 
     public Rectangle getBounds(){return bounds;};
+
+    @Override
+    public void setPosition(float x, float y) {
+        super.setPosition(x, y);
+
+        polygon = new Polygon(new float[]{0,0,bounds.getWidth(),0,bounds.getWidth(),
+                bounds.getHeight(),0,bounds.getHeight()});
+        polygon.setScale(getScaleX(),getScaleY());
+        polygon.setPosition(getX(),getY());
+    }
 }

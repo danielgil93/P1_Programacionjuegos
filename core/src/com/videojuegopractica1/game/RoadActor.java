@@ -20,7 +20,6 @@ public class RoadActor extends Actor implements Disposable{
         setY(0);
         setOrigin(0, 0);
         setSize(128*2, 128*2);
-        setScale(Gdx.graphics.getDensity());
     }
 
     @Override

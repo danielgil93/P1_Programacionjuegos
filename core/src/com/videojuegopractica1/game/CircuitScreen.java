@@ -5,14 +5,18 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 import java.util.ArrayList;
 import java.util.Vector;
@@ -57,20 +61,20 @@ public class CircuitScreen extends Screen {
             }
         }
         carActor = new CarActor();
+        carActor.setPosition(128*3-carActor.getWidth()/2,128*7-carActor.getHeight()/2);
         stage.addActor(carActor);
-        carActor.bounds=new Rectangle(stage.getCamera().position.x+carActor.getX(),
-                stage.getCamera().position.y+carActor.getY(),
-                carActor.getWidth()*carActor.getScaleX(),
-                carActor.getScaleY()*carActor.getHeight());
-        //carActor.setPosition(128*Gdx.graphics.getDensity()*4+64*Gdx.graphics.getDensity(),
-          //      128*Gdx.graphics.getDensity()*2+64*Gdx.graphics.getDensity());
+
         stage.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                /*Gdx.app.log("tocado", String.valueOf(x));
-                if(x<0)
+                Vector3 relativo= stage.getCamera().project(new Vector3(x,y,0));
+                if(relativo.x<Gdx.graphics.getWidth()/2) {
                     carActor.rotateBy(15f);
-                else
-                    carActor.rotateBy(-15f);*/
+                    stage.getCamera().rotate(new Vector3(0, 0, 1), 15);
+                }
+                else {
+                    carActor.rotateBy(-15f);
+                    stage.getCamera().rotate(new Vector3(0,0,1),-15);
+                }
                 return false;
             }
 
@@ -129,13 +133,21 @@ public class CircuitScreen extends Screen {
         stage.draw();
         stage.act(delta);
         inputManager(delta);
-        stage.getCamera().position.set(carActor.getX(),carActor.getY(),0);
+
+        ShapeRenderer shapeRenderer=new ShapeRenderer();
+        shapeRenderer.setProjectionMatrix(stage.getCamera().combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(1, 0, 0, 1);
+        Vector2 camPos=carActor.getCenter();
+        stage.getCamera().position.set(camPos.x, camPos.y, 0);
         for(int i=0;i < stage.getActors().size;i++){
             if(stage.getActors().get(i).getClass()==GrassActor.class) {
                 GrassActor grassActor=(GrassActor) stage.getActors().get(i);
-                if (carActor.getBounds().overlaps(grassActor.getBounds())) {
+                if(Intersector.overlapConvexPolygons(carActor.polygon,grassActor.polygon)){
                     speed=MIN_SPEED;
                     Gdx.app.log("estado","hierba");
+                    shapeRenderer.polygon(grassActor.polygon.getTransformedVertices());
+                    shapeRenderer.polygon(carActor.polygon.getTransformedVertices());
                     break;
                 }
                 else {
@@ -144,22 +156,18 @@ public class CircuitScreen extends Screen {
                 }
             }
         }
-        ShapeRenderer shapeRenderer=new ShapeRenderer();
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1, 0, 0, 1);
-        shapeRenderer.rect(carActor.getBounds().x, carActor.getBounds().y,
-                carActor.getBounds().width, carActor.getBounds().height);
+        //shapeRenderer.polygon(carActor.polygon.getTransformedVertices());
         shapeRenderer.end();
     }
 
     private void inputManager(float delta){
 
         float acceleration=Gdx.input.getAccelerometerY();
-        carActor.rotateBy(-0.5f*acceleration);
-        stage.getCamera().rotate(new Vector3(0,0,1),-0.5f*acceleration);
+        //carActor.rotateBy(-0.5f*acceleration);
+        //stage.getCamera().rotate(new Vector3(0,0,1),-0.5f*acceleration);
 
 
-float angle = (float) ((carActor.getRotation()*Math.PI/180)+(Math.PI/2)); // Body angle in radians.
+        float angle = (float) ((carActor.getRotation()*Math.PI/180)+(Math.PI/2)); // Body angle in radians.
 
         //Gdx.app.log("angle", String.valueOf(angle));
 
@@ -176,5 +184,11 @@ float angle = (float) ((carActor.getRotation()*Math.PI/180)+(Math.PI/2)); // Bod
     public void show() {
         super.show();
         Gdx.input.setInputProcessor(stage);
+        ((OrthographicCamera)stage.getCamera()).zoom /= Gdx.graphics.getDensity()/1.5f;
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        ((OrthographicCamera)stage.getCamera()).setToOrtho(false,width,height);
     }
 }
