@@ -32,10 +32,20 @@ public class CircuitScreen extends Screen {
     ArrayList<GrassActor> grassActor;
     GoalActor goalActor;
     CarActor carActor;
-    float speed = 5;
+    float speed = 0;
+    float aceleration=0;
+
+    boolean outRoad=false;
+    boolean acelerando=false;
+    boolean frenando=false;
 
     float MIN_SPEED=2f;
-    float MAX_SPEED=10f;
+    float MAX_SPEED=20f;
+    float ACCELERATE=5f;
+    float BRAKE=-10f;
+    float NEUTRAL=-3;
+    float DIRECTION_FACTOR=-1f;
+    float DIRECTION_DEAD=2;
 
     public CircuitScreen(final Game game){
         super(game);
@@ -74,18 +84,34 @@ public class CircuitScreen extends Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 Vector3 relativo= stage.getCamera().project(new Vector3(x,y,0));
                 if(relativo.x<Gdx.graphics.getWidth()/2) {
-                    carActor.rotateBy(15f);
-                    stage.getCamera().rotate(new Vector3(0, 0, 1), 15);
+                    frenando=true;
                 }
                 else {
-                    carActor.rotateBy(-15f);
-                    stage.getCamera().rotate(new Vector3(0,0,1),-15);
+                    acelerando=true;
                 }
-                return false;
+                if(frenando==acelerando)
+                    aceleration=NEUTRAL;
+                else if(acelerando)
+                    aceleration=ACCELERATE;
+                else if(frenando)
+                    aceleration=BRAKE;
+                return true;
             }
 
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                Gdx.app.log("Example", "touch done at (" + x + ", " + y + ")");
+                Vector3 relativo= stage.getCamera().project(new Vector3(x,y,0));
+                if(relativo.x<Gdx.graphics.getWidth()/2) {
+                    frenando=false;
+                }
+                else {
+                    acelerando=false;
+                }
+                if(frenando==acelerando)
+                    aceleration=NEUTRAL;
+                else if(acelerando)
+                    aceleration=ACCELERATE;
+                else if(frenando)
+                    aceleration=BRAKE;
             }
         });
     }
@@ -145,20 +171,19 @@ public class CircuitScreen extends Screen {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(1, 0, 0, 1);
         Vector2 camPos=carActor.getCenter();
-        stage.getCamera().position.set(camPos.x, camPos.y, 0);
+        stage.getCamera().position.set(camPos.x,
+                camPos.y/*+Gdx.graphics.getHeight()*((OrthographicCamera)stage.getCamera()).zoom/2-carActor.getHeight()*/, 0);
         for(int i=0;i < stage.getActors().size;i++){
             if(stage.getActors().get(i).getClass()==GrassActor.class) {
                 GrassActor grassActor=(GrassActor) stage.getActors().get(i);
                 if(Intersector.overlapConvexPolygons(carActor.polygon,grassActor.polygon)){
-                    speed=MIN_SPEED;
-                    Gdx.app.log("estado","hierba");
-                    shapeRenderer.polygon(grassActor.polygon.getTransformedVertices());
-                    shapeRenderer.polygon(carActor.polygon.getTransformedVertices());
+                    /*shapeRenderer.polygon(grassActor.polygon.getTransformedVertices());
+                    shapeRenderer.polygon(carActor.polygon.getTransformedVertices());*/
+                    outRoad=true;
                     break;
                 }
                 else {
-                    speed = MAX_SPEED;
-                    Gdx.app.log("estado","carretera");
+                    outRoad=false;
                 }
             }
         }
@@ -168,22 +193,41 @@ public class CircuitScreen extends Screen {
 
     private void inputManager(float delta){
 
-        float acceleration=Gdx.input.getAccelerometerY();
-        //carActor.rotateBy(-0.5f*acceleration);
-        //stage.getCamera().rotate(new Vector3(0,0,1),-0.5f*acceleration);
-
+        float direction=Gdx.input.getAccelerometerY();
+        if(Math.abs(direction)>DIRECTION_DEAD) {
+            carActor.rotateBy(DIRECTION_FACTOR * direction);
+            stage.getCamera().rotate(new Vector3(0, 0, 1), DIRECTION_FACTOR * direction);
+        }
 
         float angle = (float) ((carActor.getRotation()*Math.PI/180)+(Math.PI/2)); // Body angle in radians.
 
-        //Gdx.app.log("angle", String.valueOf(angle));
+        float velX = MathUtils.cos(angle); // X-component.
+        float velY = MathUtils.sin(angle); // Y-component.
 
-        float velX = MathUtils.cos(angle) * speed; // X-component.
-        float velY = MathUtils.sin(angle) * speed; // Y-component.
+        Vector2 dir= new Vector2(velX,velY);
+        dir=dir.nor();
+        /*Gdx.app.log("aceleracion fuera", String.valueOf(outRoad));
+        Gdx.app.log("aceleracion speed", String.valueOf(speed));
+        Gdx.app.log("aceleracion aceleracion", String.valueOf(aceleration));
+        Gdx.app.log("aceleracion frenando", String.valueOf(frenando));
+        Gdx.app.log("aceleracion acelerando", String.valueOf(acelerando));*/
+        //Gdx.app.log("aceleracion direccion", String.valueOf(direction));
+        if(outRoad)
+            speed=speed+BRAKE*delta;
+        else
+            speed=speed+aceleration*delta;
 
-        //Gdx.app.log("x", String.valueOf(velX));
-       // Gdx.app.log("y", String.valueOf(velY));
+        if(speed<0)
+            speed=0;
+        else if(speed>MAX_SPEED)
+            speed=MAX_SPEED;
 
-        carActor.moveBy(velX,velY);
+        if(speed<MIN_SPEED&&aceleration==ACCELERATE)
+            speed=MIN_SPEED;
+
+        dir.scl(speed);
+
+        carActor.moveBy(dir.x,dir.y);
     }
 
     @Override
