@@ -195,8 +195,8 @@ public class CircuitScreen extends Screen {
 
         float direction=Gdx.input.getAccelerometerY();
         if(Math.abs(direction)>DIRECTION_DEAD) {
-            carActor.rotateBy(DIRECTION_FACTOR * direction);
-            stage.getCamera().rotate(new Vector3(0, 0, 1), DIRECTION_FACTOR * direction);
+            //carActor.rotateBy(DIRECTION_FACTOR * direction);
+            //stage.getCamera().rotate(new Vector3(0, 0, 1), DIRECTION_FACTOR * direction);
         }
 
         float angle = (float) ((carActor.getRotation()*Math.PI/180)+(Math.PI/2)); // Body angle in radians.
