@@ -12,25 +12,25 @@ import com.badlogic.gdx.utils.Disposable;
  * Created by Juan Antonio on 04/04/2017.
  */
 
-public class GrassActor extends Actor implements Disposable{
-    private Texture grass;
+public class GoalActor extends Actor implements Disposable{
+    private Texture goal;
     Rectangle bounds;
     public Polygon polygon;
 
-    public GrassActor(){
-        grass = new Texture("grass.png");
+    public GoalActor(){
+        goal = new Texture("goal.png");
         setX(0);
         setY(0);
         setOrigin(0, 0);
         setSize(128*2, 128*2);
-        bounds = new Rectangle(getX(),getY(),getWidth(),getHeight());
+        bounds = new Rectangle(getX(),getY()+getHeight()/4,getWidth(),getHeight()/2);
 
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        TextureRegion textureRegion = new TextureRegion(grass);
+        TextureRegion textureRegion = new TextureRegion(goal);
         batch.draw(textureRegion, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), 0);
     }
 
@@ -41,7 +41,7 @@ public class GrassActor extends Actor implements Disposable{
 
     @Override
     public void dispose() {
-        grass.dispose();
+        goal.dispose();
     }
 
     public Rectangle getBounds(){return bounds;};

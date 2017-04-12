@@ -28,8 +28,9 @@ import java.util.Vector;
 public class CircuitScreen extends Screen {
 
     Stage stage;
-    RoadActor[] roadActor;
-    GrassActor[] grassActor;
+    ArrayList<RoadActor> roadActor;
+    ArrayList<GrassActor> grassActor;
+    GoalActor goalActor;
     CarActor carActor;
     float speed = 5;
 
@@ -40,26 +41,31 @@ public class CircuitScreen extends Screen {
         super(game);
         stage = new Stage();
         ArrayList<Vector2> posiciones = getPosiciones();
-        roadActor = new RoadActor[32];
-        grassActor = new GrassActor[34];
-        for (int i = 0; i<32; i++) {
-            roadActor[i] = new RoadActor();
-            roadActor[i].setPosition(posiciones.get(i).x*roadActor[i].getWidth()*roadActor[i].getScaleX(),
-                    posiciones.get(i).y*roadActor[i].getHeight()*roadActor[i].getScaleY());
-            stage.addActor(roadActor[i]);
+        roadActor = new ArrayList<RoadActor>();
+        grassActor = new ArrayList<GrassActor>();
+        for (int i = 0; i<getPosiciones().size(); i++) {
+            roadActor.add(i, new RoadActor());
+            RoadActor aux=roadActor.get(i);
+            aux.setPosition(posiciones.get(i).x*aux.getWidth()*aux.getScaleX(),
+                    posiciones.get(i).y*aux.getHeight()*aux.getScaleY());
+            stage.addActor(aux);
         }
         int contador = 0;
         for (int j = 0; j < 11; j++) {
             for (int k = 0; k < 6; k++) {
                 if (!posiciones.contains(new Vector2(j, k))) {
-                    grassActor[contador] = new GrassActor();
-                    grassActor[contador].setPosition(j*grassActor[contador].getWidth()*grassActor[contador].getScaleX(),
-                            k*grassActor[contador].getHeight()*grassActor[contador].getScaleY());
-                    stage.addActor(grassActor[contador]);
+                    grassActor.add(contador, new GrassActor());
+                    GrassActor aux= grassActor.get(contador);
+                    aux.setPosition(j*aux.getWidth()*aux.getScaleX(),
+                            k*aux.getHeight()*aux.getScaleY());
+                    stage.addActor(aux);
                     contador++;
                 }
             }
         }
+        goalActor = new GoalActor();
+        goalActor.setPosition(128*2,128*6);
+        stage.addActor(goalActor);
         carActor = new CarActor();
         carActor.setPosition(128*3-carActor.getWidth()/2,128*7-carActor.getHeight()/2);
         stage.addActor(carActor);
