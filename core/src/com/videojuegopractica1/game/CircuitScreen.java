@@ -54,15 +54,25 @@ public class CircuitScreen extends Screen {
         roadActor = new ArrayList<RoadActor>();
         grassActor = new ArrayList<GrassActor>();
         for (int i = 0; i<getPosiciones().size(); i++) {
-            roadActor.add(i, new RoadActor());
+            roadActor.add(i, new RoadActor(i%3==0));
             RoadActor aux=roadActor.get(i);
-            aux.setPosition(posiciones.get(i).x*aux.getWidth()*aux.getScaleX(),
-                    posiciones.get(i).y*aux.getHeight()*aux.getScaleY());
+            aux.setPosition(posiciones.get(i).x*aux.getWidth(),
+                    posiciones.get(i).y*aux.getHeight());
+            //CADA 3 PONEMOS UNA CARRETERA CON LA DIRECCION DE LA SIGUIENTE
+            if (posiciones.get(i).x == posiciones.get((i + 1) % posiciones.size()).x) {
+                if (posiciones.get(i).y > posiciones.get((i + 1) % posiciones.size()).y)
+                    aux.rotateBy(180);
+            } else if (posiciones.get(i).y == posiciones.get((i + 1) % posiciones.size()).y) {
+                if (posiciones.get(i).x > posiciones.get((i + 1) % posiciones.size()).x)
+                    aux.rotateBy(90);
+                else
+                    aux.rotateBy(-90);
+            }
             stage.addActor(aux);
         }
         int contador = 0;
-        for (int j = 0; j < 11; j++) {
-            for (int k = 0; k < 6; k++) {
+        for (int j = 0; j < 12; j++) {
+            for (int k = -1; k < 7; k++) {
                 if (!posiciones.contains(new Vector2(j, k))) {
                     grassActor.add(contador, new GrassActor());
                     GrassActor aux= grassActor.get(contador);
@@ -118,10 +128,6 @@ public class CircuitScreen extends Screen {
 
     private ArrayList<Vector2> getPosiciones (){
         Vector2[] pos = {
-                new Vector2(2, 0),
-                new Vector2(2, 1),
-                new Vector2(2, 2),
-                new Vector2(1, 2),
                 new Vector2(1, 3),
                 new Vector2(1, 4),
                 new Vector2(2, 4),
@@ -149,7 +155,11 @@ public class CircuitScreen extends Screen {
                 new Vector2(5, 1),
                 new Vector2(4, 1),
                 new Vector2(4, 0),
-                new Vector2(3, 0)
+                new Vector2(3, 0),
+                new Vector2(2, 0),
+                new Vector2(2, 1),
+                new Vector2(2, 2),
+                new Vector2(1, 2)
         };
         ArrayList<Vector2> posiciones = new ArrayList<Vector2>();
         for (int i = 0; i<pos.length; i++)

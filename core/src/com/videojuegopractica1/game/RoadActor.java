@@ -14,19 +14,22 @@ import com.badlogic.gdx.utils.Disposable;
 public class RoadActor extends Actor implements Disposable{
     private Texture road;
 
-    public RoadActor(){
-        road = new Texture("road.png");
+    public RoadActor(boolean withDir){
+        if(withDir)
+            road = new Texture("road_with_dir.png");
+        else
+            road = new Texture("road.png");
         setX(0);
         setY(0);
-        setOrigin(0, 0);
         setSize(128*2, 128*2);
+        setOrigin(getWidth()/2, getHeight()/2);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
         TextureRegion textureRegion = new TextureRegion(road);
-        batch.draw(textureRegion, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), 0);
+        batch.draw(textureRegion, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
     }
 
     @Override
