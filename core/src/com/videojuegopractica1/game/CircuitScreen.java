@@ -278,12 +278,19 @@ public class CircuitScreen extends Screen {
         //shapeRendererHud.end();
     }
 
+    private float getWheelRestriction(){
+        if(speed<100)
+            return 1;
+        else
+            return (float) (-Math.log10( (((speed - 100) / 25) + 2) - 1) + 1);
+    }
     private void inputManager(float delta){
 
         float direction=Gdx.input.getAccelerometerY();
-        if(Math.abs(direction)>DIRECTION_DEAD) {
-            //carActor.rotateBy(DIRECTION_FACTOR * direction);
-            //stage.getCamera().rotate(new Vector3(0, 0, 1), DIRECTION_FACTOR * direction);
+        float restriction=getWheelRestriction();
+        if(Math.abs(direction)> DIRECTION_DEADZONE) {
+            carActor.rotateBy(DIRECTION_FACTOR * direction * restriction);
+            stage.getCamera().rotate(new Vector3(0, 0, 1), DIRECTION_FACTOR * direction * restriction);
         }
 
         float angle = (float) ((carActor.getRotation()*Math.PI/180)+(Math.PI/2)); // Body angle in radians.
