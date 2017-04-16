@@ -1,25 +1,24 @@
 package com.videojuegopractica1.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 /**
  * Created by Juan Antonio on 04/04/2017.
@@ -31,7 +30,18 @@ public class CircuitScreen extends Screen {
     ArrayList<RoadActor> roadActor;
     ArrayList<GrassActor> grassActor;
     GoalActor goalActor;
+    Polygon checkPoint;
     CarActor carActor;
+    Label timeLabel;
+    Label lapLabel;
+    Label speedLabel;
+    SpriteBatch hudSpriteBatch;
+    Skin skin;
+
+    int lap=0;
+    float lapTime=0;
+    boolean check=false;
+
     float speed = 0;
     float aceleration=0;
 
@@ -39,17 +49,20 @@ public class CircuitScreen extends Screen {
     boolean acelerando=false;
     boolean frenando=false;
 
-    float MIN_SPEED=2f;
-    float MAX_SPEED=20f;
-    float ACCELERATE=5f;
-    float BRAKE=-10f;
-    float NEUTRAL=-3;
+    float MIN_SPEED=20f;
+    float MAX_SPEED=200f;
+    float ACCELERATE=20f;
+    float BRAKE=-50f;
+    float NEUTRAL=-6;
     float DIRECTION_FACTOR=-1f;
-    float DIRECTION_DEAD=2;
+    float DIRECTION_DEADZONE=1;
 
     public CircuitScreen(final Game game){
         super(game);
+        skin=new Skin(Gdx.files.internal("skin/uiskin.json"));
+        hudSpriteBatch = new SpriteBatch();
         stage = new Stage();
+
         ArrayList<Vector2> posiciones = getPosiciones();
         roadActor = new ArrayList<RoadActor>();
         grassActor = new ArrayList<GrassActor>();
@@ -84,11 +97,43 @@ public class CircuitScreen extends Screen {
             }
         }
         goalActor = new GoalActor();
-        goalActor.setPosition(128*2,128*6);
+        goalActor.setPosition(goalActor.getWidth(),goalActor.getHeight()*3);
         stage.addActor(goalActor);
         carActor = new CarActor();
         carActor.setPosition(128*3-carActor.getWidth()/2,128*7-carActor.getHeight()/2);
         stage.addActor(carActor);
+
+        RoadActor aux = roadActor.get((int)roadActor.size()/2);
+        //Rectangle rectangle = new Rectangle(aux.getX(),aux.getY(),aux.getWidth(),aux.getHeight());
+        checkPoint = new Polygon(new float[]{0,0,aux.getWidth(),0,aux.getWidth(),
+                aux.getHeight(),0,aux.getHeight()});
+        checkPoint.setPosition(aux.getX(),aux.getY());
+
+        float FONT_SCALE=4*((OrthographicCamera)stage.getCamera()).zoom;
+        float LABEL_HEIGHT=100*((OrthographicCamera)stage.getCamera()).zoom;
+        float LABEL_Y=Gdx.graphics.getHeight()-LABEL_HEIGHT;
+        Color LABEL_COLOR=Color.BLACK;
+
+        speedLabel = new Label(String.valueOf(speed),skin);
+        speedLabel.setSize(Gdx.graphics.getWidth(), LABEL_HEIGHT);
+        speedLabel.setFontScale(FONT_SCALE);
+        speedLabel.setPosition(0,LABEL_Y);
+        speedLabel.setAlignment(Align.right);
+        speedLabel.setColor(LABEL_COLOR);
+
+        lapLabel = new Label(String.valueOf(lap),skin);
+        lapLabel.setSize(Gdx.graphics.getWidth(), LABEL_HEIGHT);
+        lapLabel.setFontScale(FONT_SCALE);
+        lapLabel.setPosition(0,LABEL_Y);
+        lapLabel.setAlignment(Align.left);
+        lapLabel.setColor(LABEL_COLOR);
+
+        timeLabel = new Label(String.valueOf(lapTime),skin);
+        timeLabel.setSize(Gdx.graphics.getWidth(), LABEL_HEIGHT);
+        timeLabel.setFontScale(FONT_SCALE);
+        timeLabel.setPosition(0,LABEL_Y);
+        timeLabel.setAlignment(Align.center);
+        timeLabel.setColor(LABEL_COLOR);
 
         stage.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -170,10 +215,14 @@ public class CircuitScreen extends Screen {
     @Override
     public void render(float delta) {
         super.render(delta);
+        lapTime+=delta;
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.draw();
         stage.act(delta);
+        timeLabel.setText(String.valueOf(Math.round(lapTime * 100.0) / 100.0));
+        //Vector3 relativo= stage.getCamera().unproject(new Vector3(0,Gdx.graphics.getHeight()/2-lapLabel.getHeight(),0));
+        //lapLabel.setPosition(relativo.x,relativo.y);
         inputManager(delta);
 
         ShapeRenderer shapeRenderer=new ShapeRenderer();
@@ -197,8 +246,36 @@ public class CircuitScreen extends Screen {
                 }
             }
         }
+        //shapeRenderer.polygon(checkPoint.getTransformedVertices());
+        if(Intersector.overlapConvexPolygons(carActor.polygon, checkPoint)) {
+            check = true;
+            //Gdx.app.log("meta check", String.valueOf(check));
+        }
+        if(Intersector.overlapConvexPolygons(goalActor.polygon, carActor.polygon)){
+           // Gdx.app.log("meta meta", String.valueOf(check));
+            if(check){
+                check=false;
+                lap++;
+                lapLabel.setText(String.valueOf(lap));
+                Gdx.app.log("meta vuelta", String.valueOf(lap));
+                Gdx.app.log("meta tiempo", String.valueOf(lapTime));
+                lapTime=0;
+
+            }
+        }
         //shapeRenderer.polygon(carActor.polygon.getTransformedVertices());
         shapeRenderer.end();
+
+        /*ShapeRenderer shapeRendererHud=new ShapeRenderer();
+        shapeRendererHud.begin(ShapeRenderer.ShapeType.Line);
+        shapeRendererHud.setColor(1, 0, 0, 1);
+        shapeRendererHud.rect(lapLabel.getX(),lapLabel.getY(),lapLabel.getWidth(),lapLabel.getHeight());*/
+        hudSpriteBatch.begin();
+        lapLabel.draw(hudSpriteBatch,1);
+        timeLabel.draw(hudSpriteBatch,1);
+        speedLabel.draw(hudSpriteBatch,1);
+        hudSpriteBatch.end();
+        //shapeRendererHud.end();
     }
 
     private void inputManager(float delta){
@@ -235,7 +312,9 @@ public class CircuitScreen extends Screen {
         if(speed<MIN_SPEED&&aceleration==ACCELERATE)
             speed=MIN_SPEED;
 
-        dir.scl(speed);
+        dir.scl(speed/10);
+        speedLabel.setText(String.valueOf(Math.round(speed)));
+        speedLabel.setColor(1,(speed<80)?1:1-((speed-80)/120f),0,1);
 
         carActor.moveBy(dir.x,dir.y);
     }
