@@ -1,8 +1,4 @@
-package com.videojuegopractica1.game;
-
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+package com.drap.games.racegame;
 
 /**
  * Created by Juan Antonio on 04/04/2017.

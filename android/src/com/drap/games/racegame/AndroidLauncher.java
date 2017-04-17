@@ -1,10 +1,10 @@
-package com.videojuegopractica1.game;
+package com.drap.games.racegame;
 
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.videojuegopractica1.game.Game;
+import com.drap.games.racegame.Game;
 
 public class AndroidLauncher extends AndroidApplication {
 	@Override

@@ -18,7 +18,7 @@ android {
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
     defaultConfig {
-        applicationId "com.videojuegopractica1.game"
+        applicationId "com.drap.games.racegame"
         minSdkVersion 9
         targetSdkVersion 24
     }
@@ -71,7 +71,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.videojuegopractica1.game/com.videojuegopractica1.game.AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.drap.games.racegame/com.drap.games.racegame.AndroidLauncher'
 }
 
 // sets up the Android Eclipse project, using the old Ant based build.

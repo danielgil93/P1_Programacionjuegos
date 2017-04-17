@@ -1,4 +1,4 @@
-package com.videojuegopractica1.game;
+package com.drap.games.racegame;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -12,25 +12,25 @@ import com.badlogic.gdx.utils.Disposable;
  * Created by Juan Antonio on 04/04/2017.
  */
 
-public class GoalActor extends Actor implements Disposable{
-    private Texture goal;
+public class GrassActor extends Actor implements Disposable{
+    private Texture grass;
     Rectangle bounds;
     public Polygon polygon;
 
-    public GoalActor(){
-        goal = new Texture("goal.png");
+    public GrassActor(){
+        grass = new Texture("grass.png");
         setX(0);
         setY(0);
         setOrigin(0, 0);
         setSize(128*2, 128*2);
-        bounds = new Rectangle(getX(),getY()+getHeight()/4,getWidth(),getHeight()/2);
+        bounds = new Rectangle(getX(),getY(),getWidth(),getHeight());
 
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        TextureRegion textureRegion = new TextureRegion(goal);
+        TextureRegion textureRegion = new TextureRegion(grass);
         batch.draw(textureRegion, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), 0);
     }
 
@@ -41,7 +41,7 @@ public class GoalActor extends Actor implements Disposable{
 
     @Override
     public void dispose() {
-        goal.dispose();
+        grass.dispose();
     }
 
     public Rectangle getBounds(){return bounds;};

@@ -1,4 +1,4 @@
-package com.videojuegopractica1.game;
+package com.drap.games.racegame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -236,7 +236,7 @@ public class CircuitScreen extends Screen {
         stage.getCamera().position.set(camPos.x,
                 camPos.y/*+Gdx.graphics.getHeight()*((OrthographicCamera)stage.getCamera()).zoom/2-carActor.getHeight()*/, 0);
         for(int i=0;i < stage.getActors().size;i++){
-            if(stage.getActors().get(i).getClass()==GrassActor.class) {
+            if(stage.getActors().get(i).getClass()== GrassActor.class) {
                 GrassActor grassActor=(GrassActor) stage.getActors().get(i);
                 if(Intersector.overlapConvexPolygons(carActor.polygon,grassActor.polygon)){
                     /*shapeRenderer.polygon(grassActor.polygon.getTransformedVertices());
@@ -335,7 +335,9 @@ public class CircuitScreen extends Screen {
     public void show() {
         super.show();
         Gdx.input.setInputProcessor(stage);
+        Gdx.app.log("zoom", String.valueOf(((OrthographicCamera)stage.getCamera()).zoom));
         ((OrthographicCamera)stage.getCamera()).zoom = 1/(Gdx.graphics.getDensity()/1.5f);
+        //((OrthographicCamera)stage.getCamera()).zoom = 3;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.videojuegopractica1.game;
+package com.drap.games.racegame;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
