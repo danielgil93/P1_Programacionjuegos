@@ -1,6 +1,9 @@
 package com.drap.games.racegame;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,6 +20,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
 
@@ -37,6 +42,15 @@ public class CircuitScreen extends Screen {
     Label speedLabel;
     SpriteBatch hudSpriteBatch;
     Skin skin;
+    Music accelerationSound;
+    Sound brakeSound;
+    Sound gearDownSound;
+
+    Camera miniMap;
+    Camera stageCamera;
+
+    ScreenViewport miniMapViewport;
+    ScreenViewport originalViewport;
 
     int N_LAPS=0;
 
@@ -65,6 +79,15 @@ public class CircuitScreen extends Screen {
         skin=new Skin(Gdx.files.internal("skin/uiskin.json"));
         hudSpriteBatch = new SpriteBatch();
         stage = new Stage();
+
+        miniMap = new OrthographicCamera();
+        miniMapViewport = new ScreenViewport(miniMap);
+        stageCamera=stage.getCamera();
+        originalViewport = new ScreenViewport(stageCamera);
+
+        accelerationSound = Gdx.audio.newMusic(Gdx.files.internal("accelerating.wav"));
+        brakeSound = Gdx.audio.newSound(Gdx.files.internal("brake2.wav"));
+        gearDownSound = Gdx.audio.newSound(Gdx.files.internal("geardown.wav"));
 
         ArrayList<Vector2> posiciones = getPosiciones();
         roadActor = new ArrayList<RoadActor>();
@@ -147,8 +170,9 @@ public class CircuitScreen extends Screen {
                 else {
                     acelerando=true;
                 }
-                if(frenando==acelerando)
-                    aceleration=NEUTRAL;
+                if(frenando==acelerando) {
+                    aceleration = NEUTRAL;
+                }
                 else if(acelerando)
                     aceleration=ACCELERATE;
                 else if(frenando)
@@ -223,6 +247,26 @@ public class CircuitScreen extends Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.draw();
         stage.act(delta);
+
+        Camera or=stage.getCamera();
+        Viewport viewport=stage.getViewport();
+
+        stage.getViewport().setCamera(miniMap);
+        ((OrthographicCamera)miniMap).zoom=30f;
+        stage.draw();
+        stage.getViewport().setCamera(stageCamera);
+        //stage.setViewport(viewport);
+
+        //float h=stage.getCamera().viewportHeight;
+        //float w=stage.getCamera().viewportWidth;
+        //stage.getCamera().viewportHeight=50;
+        //stage.getCamera().viewportWidth=100;
+        //((OrthographicCamera)stage.getCamera()).setToOrtho(false,50,100);
+        //((OrthographicCamera)stage.getCamera()).zoom=30f;
+        //stage.draw();
+        //stage.getCamera().viewportHeight=h;
+        //stage.getCamera().viewportWidth=w;
+
         timeLabel.setText(String.valueOf(Math.round(lapTime * 100.0) / 100.0));
         //Vector3 relativo= stage.getCamera().unproject(new Vector3(0,Gdx.graphics.getHeight()/2-lapLabel.getHeight(),0));
         //lapLabel.setPosition(relativo.x,relativo.y);
@@ -281,6 +325,9 @@ public class CircuitScreen extends Screen {
         speedLabel.draw(hudSpriteBatch,1);
         hudSpriteBatch.end();
         //shapeRendererHud.end();
+
+
+        playSound();
     }
 
     private float getWheelRestriction(){
@@ -343,6 +390,11 @@ public class CircuitScreen extends Screen {
     @Override
     public void resize(int width, int height) {
         ((OrthographicCamera)stage.getCamera()).setToOrtho(false,width,height);
+
+        miniMapViewport.update(width / 5, height /5);
+        miniMapViewport.setScreenX(-(width/2));
+        miniMapViewport.setScreenY(-(height/2));
+        originalViewport.update(width , height);
     }
 
     public int getN_LAPS() {
@@ -370,5 +422,31 @@ public class CircuitScreen extends Screen {
         carActor.setPosition(128*3-carActor.getWidth()/2,128*7-carActor.getHeight()/2);
         stage.getCamera().rotate(new Vector3(0, 0, 1), -carActor.getRotation());
         carActor.setRotation(0);
+    }
+
+    void playSound(){
+        /*if(aceleration==ACCELERATE && !accelerationSound.isPlaying()){
+            Gdx.app.log("audio","acelerando");
+            //accelerationSound.play(1f);
+            accelerationSound.setLooping(true);
+            accelerationSound.play();
+            brakeSound.stop();
+            gearDownSound.stop();
+        } else if(aceleration==NEUTRAL){
+            //accelerationSound.loop(0.2f);
+            brakeSound.stop();
+            gearDownSound.stop();
+        } else if(aceleration==BRAKE){
+            accelerationSound.stop();
+            brakeSound.play(1);
+            gearDownSound.stop();
+        }*/
+    }
+
+    @Override
+    public void dispose() {
+        accelerationSound.dispose();
+        brakeSound.dispose();
+        gearDownSound.dispose();
     }
 }
