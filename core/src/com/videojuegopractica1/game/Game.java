@@ -12,17 +12,53 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Game extends com.badlogic.gdx.Game {
 	SpriteBatch batch;
-	CircuitScreen circuitScreen;
+	public CircuitScreen circuitScreen;
+	public LoadScreen loadScreen;
+	public GameOverScreen gameOverScreen;
+
+	float fasterTime=-1;
+	float lastTime=-1;
+
+	private boolean SOUND_ON=true;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		circuitScreen = new CircuitScreen(this);
-		setScreen(circuitScreen);
+		loadScreen = new LoadScreen(this);
+		gameOverScreen = new GameOverScreen(this);
+		setScreen(loadScreen);
 	}
-	
+
+	public boolean isSOUND_ON() {
+		return SOUND_ON;
+	}
+
+	public void setSOUND_ON(boolean SOUND_ON) {
+		this.SOUND_ON = SOUND_ON;
+	}
+
 	@Override
 	public void dispose () {
 		batch.dispose();
+	}
+
+	public void gameOver(float time){
+		lastTime=time;
+		if(fasterTime==-1||fasterTime>lastTime)
+			fasterTime=lastTime;
+		setScreen(gameOverScreen);
+	}
+
+	public float getFasterTime() {
+		return fasterTime;
+	}
+
+	public float getLastTime() {
+		return lastTime;
+	}
+
+	public void restartRace(){
+		circuitScreen.restartRace();
 	}
 }

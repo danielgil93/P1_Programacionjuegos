@@ -38,8 +38,11 @@ public class CircuitScreen extends Screen {
     SpriteBatch hudSpriteBatch;
     Skin skin;
 
+    int N_LAPS=0;
+
     int lap=0;
     float lapTime=0;
+    float raceTime=0;
     boolean check=false;
 
     float speed = 0;
@@ -257,10 +260,12 @@ public class CircuitScreen extends Screen {
                 check=false;
                 lap++;
                 lapLabel.setText(String.valueOf(lap));
+                raceTime += lapTime;
                 Gdx.app.log("meta vuelta", String.valueOf(lap));
                 Gdx.app.log("meta tiempo", String.valueOf(lapTime));
                 lapTime=0;
-
+                if(lap>=N_LAPS)
+                    game.gameOver(raceTime);
             }
         }
         //shapeRenderer.polygon(carActor.polygon.getTransformedVertices());
@@ -330,11 +335,38 @@ public class CircuitScreen extends Screen {
     public void show() {
         super.show();
         Gdx.input.setInputProcessor(stage);
-        ((OrthographicCamera)stage.getCamera()).zoom /= Gdx.graphics.getDensity()/1.5f;
+        ((OrthographicCamera)stage.getCamera()).zoom = 1/(Gdx.graphics.getDensity()/1.5f);
     }
 
     @Override
     public void resize(int width, int height) {
         ((OrthographicCamera)stage.getCamera()).setToOrtho(false,width,height);
+    }
+
+    public int getN_LAPS() {
+        return N_LAPS;
+    }
+
+    public void setN_LAPS(int n_LAPS) {
+        N_LAPS = n_LAPS;
+    }
+
+    public void restartRace(){
+        lap=0;
+        raceTime=0;
+        lapTime=0;
+        check=false;
+        lapLabel.setText(String.valueOf(lap));
+
+        speed = 0;
+        aceleration=0;
+
+        outRoad=false;
+        acelerando=false;
+        frenando=false;
+
+        carActor.setPosition(128*3-carActor.getWidth()/2,128*7-carActor.getHeight()/2);
+        stage.getCamera().rotate(new Vector3(0, 0, 1), -carActor.getRotation());
+        carActor.setRotation(0);
     }
 }
