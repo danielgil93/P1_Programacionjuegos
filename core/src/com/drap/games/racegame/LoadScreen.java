@@ -28,14 +28,14 @@ public class LoadScreen extends Screen {
     ImageButton banner_button;
     Texture banner_texture;
     TextButtonColor play_button;
-    TextButtonColor start_classic_button;
-    //TextButtonColor start_crazy_button;
+    TextButtonColor start_3_lap_button;
+    TextButtonColor start_5_lap_button;
     TextButtonColor rate_button;
     TextButtonColor quit_button;
     TextButtonColor sign_button;
     TextButtonColor leaderboard_button;
-    private TextButtonColor classic_leaderboard_button;
-    //private TextButtonColor crazy_leaderboard_button;
+    private TextButtonColor leaderboard_3_button;
+    private TextButtonColor leaderboard_5_button;
     boolean isSigned;
     Label max_points;
     Skin skin;
@@ -63,7 +63,7 @@ public class LoadScreen extends Screen {
         //water=new WaterActor();
         //stage.addActor(water);
 
-        /*isSigned=game.playServices.isSignedIn();
+        isSigned=game.playServices.isSignedIn();
         if(isSigned) {
             playerName=new Label("",skin);
             playerName.setText(game.playServices.getPlayerName());
@@ -73,7 +73,7 @@ public class LoadScreen extends Screen {
             playerName.setPosition(5,
                     Gdx.graphics.getHeight() - 35*density);
             stage.addActor(playerName);
-        }*/
+        }
 
         if(!game.isSOUND_ON())
             music_texture=new Texture("musicOff.png");
@@ -110,11 +110,11 @@ public class LoadScreen extends Screen {
         table.add(play_button).fill().pad(1 * density).height(30 * density).colspan(2);//.size(100 * density, 30 * density);
         table.row();
 
-        start_classic_button =new TextButtonColor("CLASSIC",skin);
-        start_classic_button.setColor(button_background);
-        start_classic_button.getLabel().setColor(button_font);
-        start_classic_button.getLabel().setFontScale(density);
-        start_classic_button.addListener(new InputListener() {
+        start_3_lap_button =new TextButtonColor("3 LAP",skin);
+        start_3_lap_button.setColor(button_background);
+        start_3_lap_button.getLabel().setColor(button_font);
+        start_3_lap_button.getLabel().setFontScale(density);
+        start_3_lap_button.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 game.restartRace();
                 //game.setGame_mode(GameMode.CLASSIC);
@@ -124,9 +124,25 @@ public class LoadScreen extends Screen {
                 return false;
             }
         });
-        table.add(start_classic_button).fill().pad(1 * density).padBottom(10 * density).height(60*density).uniformX();//.size(100 * density, 30 * density);
+        table.add(start_3_lap_button).fill().pad(1 * density).padBottom(10 * density).height(60*density).uniformX();//.size(100 * density, 30 * density);
+
+        start_5_lap_button =new TextButtonColor("5 LAP",skin);
+        start_5_lap_button.setColor(button_background);
+        start_5_lap_button.getLabel().setColor(button_font);
+        start_5_lap_button.getLabel().setFontScale(density);
+        start_5_lap_button.addListener(new InputListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                game.restartRace();
+                //game.setGame_mode(GameMode.CLASSIC);
+                game.circuitScreen.setN_LAPS(5);
+                game.setScreen(game.circuitScreen);
+                //Gdx.input.setCatchBackKey(true);
+                return false;
+            }
+        });
+        table.add(start_5_lap_button).fill().pad(1*density).padBottom(10 * density).height(60*density).uniformX();//.size(100 * density, 30 * density);
         table.row().row();
-        /*if (isSigned) {
+        if (isSigned) {
             leaderboard_button =new TextButtonColor("LEADERBOARD",skin);
             leaderboard_button.getLabel().setFontScale(density);
             leaderboard_button.setTouchable(Touchable.disabled);
@@ -134,39 +150,39 @@ public class LoadScreen extends Screen {
             table.add(leaderboard_button).fill().pad(1 * density).height(30 * density).colspan(2);//.size(100 * density, 30 * density);
             table.row();
 
-            classic_leaderboard_button = new TextButtonColor("CLASSIC", skin);
-            classic_leaderboard_button.getLabel().setFontScale(density);
-            classic_leaderboard_button.setColor(Color.GREEN);
-            classic_leaderboard_button.addListener(new InputListener() {
+            leaderboard_3_button = new TextButtonColor("3 LAP", skin);
+            leaderboard_3_button.getLabel().setFontScale(density);
+            leaderboard_3_button.setColor(Color.GREEN);
+            leaderboard_3_button.addListener(new InputListener() {
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     //game.playServices.showScore();
                     return true;
                 }
 
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                    game.playServices.showScore(GameMode.CLASSIC);
+                    game.playServices.showScore(3);
                 }
             });
-            table.add(classic_leaderboard_button).fill().pad(1 * density).padBottom(10 * density).height(60 * density).uniformX();//.size(100 * density, 20 * density);
+            table.add(leaderboard_3_button).fill().pad(1 * density).padBottom(10 * density).height(60 * density).uniformX();//.size(100 * density, 20 * density);
 
-            crazy_leaderboard_button = new TextButtonColor("CRAZY", skin);
-            crazy_leaderboard_button.getLabel().setFontScale(density);
-            crazy_leaderboard_button.setColor(Color.GREEN);
-            crazy_leaderboard_button.addListener(new InputListener() {
+            leaderboard_5_button = new TextButtonColor("5 LAP", skin);
+            leaderboard_5_button.getLabel().setFontScale(density);
+            leaderboard_5_button.setColor(Color.GREEN);
+            leaderboard_5_button.addListener(new InputListener() {
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     //game.playServices.showScore();
                     return true;
                 }
 
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                    game.playServices.showScore(GameMode.CRAZY);
+                    game.playServices.showScore(5);
                 }
             });
-            table.add(crazy_leaderboard_button).fill().pad(1*density).padBottom(10 * density).height(60*density).uniformX();//.size(100 * density, 20 * density);
+            table.add(leaderboard_5_button).fill().pad(1*density).padBottom(10 * density).height(60*density).uniformX();//.size(100 * density, 20 * density);
             table.row();
-        }*/
+        }
 
-        /*playgame_text=new Texture("playgames.png");
+        playgame_text=new Texture("playgames.png");
         sprite=new Sprite(playgame_text);
         ImageButton image=new ImageButton(new SpriteDrawable(sprite));
         sign_button=new TextButtonColor("Play Games Sign in",skin);
@@ -208,7 +224,7 @@ public class LoadScreen extends Screen {
             }
         });
         table.add(rate_button).fill().pad(1 * density).padBottom(10 * density).colspan(2).height(30 * density);//.size(100 * density, 30 * density);
-        table.row();*/
+        table.row();
 
         quit_button=new TextButtonColor("QUIT GAME",skin);
         quit_button.setColor(button_background);

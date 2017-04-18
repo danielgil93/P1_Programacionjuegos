@@ -14,6 +14,12 @@ public class Game extends com.badlogic.gdx.Game {
 
 	private boolean SOUND_ON=true;
 
+	public static PlayServices playServices;
+
+	public Game(PlayServices playServices)
+	{
+		this.playServices = playServices;
+	}
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -38,8 +44,10 @@ public class Game extends com.badlogic.gdx.Game {
 
 	public void gameOver(float time){
 		lastTime=time;
-		if(fasterTime==-1||fasterTime>lastTime)
-			fasterTime=lastTime;
+		if(fasterTime==-1||fasterTime>lastTime) {
+			this.playServices.submitScore(3, (int) (lastTime*1000));
+			fasterTime = lastTime;
+		}
 		setScreen(gameOverScreen);
 	}
 

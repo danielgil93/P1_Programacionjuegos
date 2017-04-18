@@ -50,6 +50,8 @@ project(":android") {
     configurations { natives }
 
     dependencies {
+        compile 'com.google.android.gms:play-services-games:10.2.1'
+        compile project(':BaseGameUtils')
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"

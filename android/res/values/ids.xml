@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Google Play game services IDs.
+Save this file as res/values/games-ids.xml in your project.
+-->
+<resources>
+    <string name="app_id">448106677347</string>
+    <string name="package_name">com.drap.games.racegame</string>
+    <string name="achievement_novato">CgkI44j1qYUNEAIQAg</string>
+    <string name="achievement_conductor">CgkI44j1qYUNEAIQAw</string>
+    <string name="achievement_veterano">CgkI44j1qYUNEAIQBA</string>
+    <string name="achievement_maestro">CgkI44j1qYUNEAIQBQ</string>
+    <string name="achievement_leyenda">CgkI44j1qYUNEAIQBg</string>
+    <string name="leaderboard_ranking_3_vueltas">CgkI44j1qYUNEAIQAQ</string>
+</resources>

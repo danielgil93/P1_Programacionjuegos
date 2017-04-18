@@ -19,9 +19,14 @@ android {
     }
     defaultConfig {
         applicationId "com.drap.games.racegame"
-        minSdkVersion 9
+        multiDexEnabled true
+        minSdkVersion 15
         targetSdkVersion 24
     }
+}
+
+dependencies {
+    compile 'com.android.support:multidex:1.0.0'
 }
 
 
