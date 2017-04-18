@@ -3,6 +3,7 @@ package com.drap.games.racegame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -15,7 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
  * Created by DrAP on 10/05/2016.
  */
 public class GameOverScreen extends Screen {
+
     Stage stage;
+    Texture flag_texture = new Texture("flag.png");
     //WaterActor water;
     Table table;
     TextButton play_again_button;
@@ -24,6 +27,7 @@ public class GameOverScreen extends Screen {
     Label fasterTime;
     Label lastTime;
     Skin skin;
+
 
     final float screen_density= Gdx.graphics.getDensity();
 
@@ -56,7 +60,7 @@ public class GameOverScreen extends Screen {
         table.row();*/
 
         lastTime = new Label("Time: " + String.valueOf(game.getLastTime()), skin);
-        lastTime.setColor(Color.BLACK);
+        lastTime.setColor(Color.RED);
         lastTime.setFontScale(density * 2);
         table.add(lastTime).colspan(2);
         table.row();
@@ -100,7 +104,9 @@ public class GameOverScreen extends Screen {
     private void renderManager(float delta) {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        stage.getBatch().begin();
+        stage.getBatch().draw(flag_texture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.getBatch().end();
         stage.draw();
         stage.act(delta);
     }

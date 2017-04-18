@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 public class LoadScreen extends Screen {
     Stage stage;
     //WaterActor water;
+    Texture flag_texture = new Texture("flag.png");
     Table table;
     Label playerName;
     ImageButton mute_button;
@@ -253,7 +254,9 @@ public class LoadScreen extends Screen {
     private void renderManager(float delta) {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        stage.getBatch().begin();
+        stage.getBatch().draw(flag_texture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.getBatch().end();
         stage.draw();
         stage.act(delta);
         //if(isSigned!=game.playServices.isSignedIn())
