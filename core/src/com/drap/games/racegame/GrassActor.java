@@ -23,7 +23,8 @@ public class GrassActor extends Actor implements Disposable{
         setY(0);
         setOrigin(0, 0);
         setSize(128*2, 128*2);
-        bounds = new Rectangle(getX(),getY(),getWidth(),getHeight());
+        bounds = new Rectangle(getX()+getWidth()*0.1f, getY()+getHeight()*0.1f,
+                getWidth()*0.8f,getHeight()*0.8f);
 
     }
 
@@ -53,6 +54,6 @@ public class GrassActor extends Actor implements Disposable{
         polygon = new Polygon(new float[]{0,0,bounds.getWidth(),0,bounds.getWidth(),
                 bounds.getHeight(),0,bounds.getHeight()});
         polygon.setScale(getScaleX(),getScaleY());
-        polygon.setPosition(getX(),getY());
+        polygon.setPosition(getX()+getWidth()*0.1f, getY()+getHeight()*0.1f);
     }
 }
