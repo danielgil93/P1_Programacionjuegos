@@ -287,6 +287,7 @@ public class LoadScreen extends Screen {
     public void dispose() {
        // water.dispose();
         stage.dispose();
+        flag_texture.dispose();
         //playgame_text.dispose();
         music_texture.dispose();
         if(banner_texture!=null)

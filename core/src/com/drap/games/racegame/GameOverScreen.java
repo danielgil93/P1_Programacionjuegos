@@ -135,5 +135,6 @@ public class GameOverScreen extends Screen {
     public void dispose() {
        // water.dispose();
         stage.dispose();
+        flag_texture.dispose();
     }
 }
