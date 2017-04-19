@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 public class CircuitScreen extends Screen {
 
-    Stage stage;
+    CustonStage stage;
     ArrayList<RoadActor> roadActor;
     ArrayList<GrassActor> grassActor;
     GoalActor goalActor;
@@ -64,7 +64,7 @@ public class CircuitScreen extends Screen {
         super(game);
         skin=new Skin(Gdx.files.internal("skin/uiskin.json"));
         hudSpriteBatch = new SpriteBatch();
-        stage = new Stage();
+        stage = new CustonStage(game);
 
         ArrayList<Vector2> posiciones = getPosiciones();
         roadActor = new ArrayList<RoadActor>();
@@ -87,8 +87,8 @@ public class CircuitScreen extends Screen {
             stage.addActor(aux);
         }
         int contador = 0;
-        for (int j = 0; j < 12; j++) {
-            for (int k = -1; k < 7; k++) {
+        for (int j = -2; j < 14; j++) {
+            for (int k = -3; k < 9; k++) {
                 if (!posiciones.contains(new Vector2(j, k))) {
                     grassActor.add(contador, new GrassActor());
                     GrassActor aux= grassActor.get(contador);

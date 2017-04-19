@@ -106,7 +106,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices{
 	@Override
 	public void rateGame()
 	{
-		String str = "https://play.google.com/store/apps/details?id=com.drap.game.fising.android";
+		String str = "https://play.google.com/store/apps/details?id=com.drap.games.racegame";
 		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(str)));
 	}
 

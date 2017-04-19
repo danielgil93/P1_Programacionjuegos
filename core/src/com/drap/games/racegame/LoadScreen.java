@@ -68,7 +68,7 @@ public class LoadScreen extends Screen {
         if(isSigned) {
             playerName=new Label("",skin);
             playerName.setText(game.playServices.getPlayerName());
-            playerName.setColor(Color.BLACK);
+            playerName.setColor(Color.GREEN);
             playerName.setFontScale(density * 2);
             playerName.setHeight(30*density);
             playerName.setPosition(5,
@@ -121,7 +121,7 @@ public class LoadScreen extends Screen {
                 //game.setGame_mode(GameMode.CLASSIC);
                 game.circuitScreen.setN_LAPS(3);
                 game.setScreen(game.circuitScreen);
-                //Gdx.input.setCatchBackKey(true);
+                Gdx.input.setCatchBackKey(true);
                 return false;
             }
         });
@@ -137,7 +137,7 @@ public class LoadScreen extends Screen {
                 //game.setGame_mode(GameMode.CLASSIC);
                 game.circuitScreen.setN_LAPS(5);
                 game.setScreen(game.circuitScreen);
-                //Gdx.input.setCatchBackKey(true);
+                Gdx.input.setCatchBackKey(true);
                 return false;
             }
         });
