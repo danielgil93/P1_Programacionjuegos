@@ -42,10 +42,10 @@ public class Game extends com.badlogic.gdx.Game {
 		batch.dispose();
 	}
 
-	public void gameOver(float time){
+	public void gameOver(int laps, float time){
 		lastTime=time;
 		if(fasterTime==-1||fasterTime>lastTime) {
-			this.playServices.submitScore(3, (int) (lastTime*1000));
+			this.playServices.submitScore(laps, (int) (lastTime*1000));
 			fasterTime = lastTime;
 		}
 		setScreen(gameOverScreen);

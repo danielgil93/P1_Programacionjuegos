@@ -28,8 +28,12 @@ public class CircuitScreen extends Screen {
 
     CustonStage stage;
     ArrayList<RoadActor> roadActor;
+    ArrayList<Integer> checkPoints;
+    int lastCheckPoint=0;
+    float timeOutRoad=0;
     ArrayList<GrassActor> grassActor;
-    GoalActor goalActor;
+    ArrayList<GrassActor> grassActorExtern;
+    //GoalActor goalActor;
     Polygon checkPoint;
     CarActor carActor;
     Label timeLabel;
@@ -57,8 +61,9 @@ public class CircuitScreen extends Screen {
     float ACCELERATE=20f;
     float BRAKE=-50f;
     float NEUTRAL=-6;
-    float DIRECTION_FACTOR=-1f;
+    float DIRECTION_FACTOR=-.7f;
     float DIRECTION_DEADZONE=1;
+    float MAX_TIME_OUTROAD=2f;
 
     public CircuitScreen(final Game game){
         super(game);
@@ -68,9 +73,12 @@ public class CircuitScreen extends Screen {
 
         ArrayList<Vector2> posiciones = getPosiciones();
         roadActor = new ArrayList<RoadActor>();
+        checkPoints = new ArrayList<Integer>();
         grassActor = new ArrayList<GrassActor>();
+        grassActorExtern = new ArrayList<GrassActor>();
         for (int i = 0; i<getPosiciones().size(); i++) {
-            roadActor.add(i, new RoadActor(i%3==0));
+            roadActor.add(i, new RoadActor(i, i==0, i%3==0));
+            checkPoints.add(i, 0);
             RoadActor aux=roadActor.get(i);
             aux.setPosition(posiciones.get(i).x*aux.getWidth(),
                     posiciones.get(i).y*aux.getHeight());
@@ -86,22 +94,25 @@ public class CircuitScreen extends Screen {
             }
             stage.addActor(aux);
         }
-        int contador = 0;
+        //Se pone el ultimo check point como pasado para poder salir de la meta
+        checkPoints.set(checkPoints.size()-1,1);
         for (int j = -2; j < 14; j++) {
             for (int k = -3; k < 9; k++) {
                 if (!posiciones.contains(new Vector2(j, k))) {
-                    grassActor.add(contador, new GrassActor());
-                    GrassActor aux= grassActor.get(contador);
-                    aux.setPosition(j*aux.getWidth()*aux.getScaleX(),
-                            k*aux.getHeight()*aux.getScaleY());
+                    GrassActor aux = new GrassActor();
+                    aux.setPosition(j * aux.getWidth() * aux.getScaleX(),
+                            k * aux.getHeight() * aux.getScaleY());
+                    if (j < 0 || j > 11 || k < -1 || k > 6)
+                        grassActorExtern.add(aux);
+                    else
+                        grassActor.add(aux);
                     stage.addActor(aux);
-                    contador++;
                 }
             }
         }
-        goalActor = new GoalActor();
-        goalActor.setPosition(goalActor.getWidth(),goalActor.getHeight()*3);
-        stage.addActor(goalActor);
+        //goalActor = new GoalActor();
+        //goalActor.setPosition(goalActor.getWidth(),goalActor.getHeight()*3);
+        //stage.addActor(goalActor);
         carActor = new CarActor();
         carActor.setPosition(128*3-carActor.getWidth()/2,128*7-carActor.getHeight()/2);
         stage.addActor(carActor);
@@ -235,38 +246,52 @@ public class CircuitScreen extends Screen {
         Vector2 camPos=carActor.getCenter();
         stage.getCamera().position.set(camPos.x,
                 camPos.y/*+Gdx.graphics.getHeight()*((OrthographicCamera)stage.getCamera()).zoom/2-carActor.getHeight()*/, 0);
-        for(int i=0;i < stage.getActors().size;i++){
-            if(stage.getActors().get(i).getClass()== GrassActor.class) {
-                GrassActor grassActor=(GrassActor) stage.getActors().get(i);
-                if(Intersector.overlapConvexPolygons(carActor.polygon,grassActor.polygon)){
+        outRoad = false;
+        for (int i = 0; i < grassActor.size(); i++) {
+            GrassActor grass = grassActor.get(i);
+            if (Intersector.overlapConvexPolygons(carActor.polygon, grass.polygon)) {
+                outRoad = true;
+                break;
+            }
+        }
+        /*//for (int i = lastCheckPoint; i < 2; i++) {
+            if (Intersector.overlapConvexPolygons(carActor.polygon, roadActor.get(lastCheckPoint+1).polygon)) {
                     /*shapeRenderer.polygon(grassActor.polygon.getTransformedVertices());
                     shapeRenderer.polygon(carActor.polygon.getTransformedVertices());*/
-                    outRoad=true;
-                    break;
-                }
-                else {
-                    outRoad=false;
-                }
+/*
+                    if(lastCheckPoint!=i&&checkPoints.get((i==0)?checkPoints.size()-1:i-1)==0){
+                        //ATAJO DETECTADO
+                        carActor.setPosition(roadActor.get(lastCheckPoint).getX(),roadActor.get(lastCheckPoint).getY());
+                        stage.getCamera().rotate(new Vector3(0, 0, 1), -carActor.getRotation());
+                        carActor.setRotation(roadActor.get(lastCheckPoint).getRotation());
+                        stage.getCamera().rotate(new Vector3(0, 0, 1), carActor.getRotation());
+                        speed=0;
+                    } else {
+                        checkPoints.set(i,1);
+                        checkPoints.set((i<2)?checkPoints.size()-2+i:i-2,0);
+                        lastCheckPoint=i;
+                    }
             }
-        }
-        //shapeRenderer.polygon(checkPoint.getTransformedVertices());
-        if(Intersector.overlapConvexPolygons(carActor.polygon, checkPoint)) {
-            check = true;
-            //Gdx.app.log("meta check", String.valueOf(check));
-        }
-        if(Intersector.overlapConvexPolygons(goalActor.polygon, carActor.polygon)){
-           // Gdx.app.log("meta meta", String.valueOf(check));
-            if(check){
-                check=false;
+        }*/
+        if (Intersector.overlapConvexPolygons(carActor.polygon, roadActor.get((lastCheckPoint+1)%roadActor.size()).polygon)) {
+            lastCheckPoint = (lastCheckPoint + 1) % roadActor.size();
+            if(lastCheckPoint==0){
                 lap++;
-                lapLabel.setText(String.valueOf(lap));
+                lapLabel.setText(String.valueOf(lap+1));
                 raceTime += lapTime;
-                Gdx.app.log("meta vuelta", String.valueOf(lap));
-                Gdx.app.log("meta tiempo", String.valueOf(lapTime));
                 lapTime=0;
                 if(lap>=N_LAPS)
-                    game.gameOver(raceTime);
+                    game.gameOver(N_LAPS,raceTime);
             }
+        } else if (!Intersector.overlapConvexPolygons(carActor.polygon, roadActor.get(lastCheckPoint).polygon)){
+            RoadActor lastRoad = roadActor.get(lastCheckPoint);
+            float rotation = roadActor.get(lastCheckPoint).getRotation();
+            carActor.setPosition((lastRoad.getX() + (lastRoad.getWidth() / 2)) - (carActor.getWidth() / 2),
+                    (lastRoad.getY() + (lastRoad.getHeight() / 2)) - (carActor.getHeight() / 2));
+            stage.getCamera().rotate(new Vector3(0, 0, 1), -carActor.getRotation());
+            carActor.setRotation(rotation);
+            stage.getCamera().rotate(new Vector3(0, 0, 1), carActor.getRotation());
+            speed=0;
         }
         //shapeRenderer.polygon(carActor.polygon.getTransformedVertices());
         shapeRenderer.end();
@@ -305,12 +330,7 @@ public class CircuitScreen extends Screen {
 
         Vector2 dir= new Vector2(velX,velY);
         dir=dir.nor();
-        /*Gdx.app.log("aceleracion fuera", String.valueOf(outRoad));
-        Gdx.app.log("aceleracion speed", String.valueOf(speed));
-        Gdx.app.log("aceleracion aceleracion", String.valueOf(aceleration));
-        Gdx.app.log("aceleracion frenando", String.valueOf(frenando));
-        Gdx.app.log("aceleracion acelerando", String.valueOf(acelerando));*/
-        //Gdx.app.log("aceleracion direccion", String.valueOf(direction));
+
         if(outRoad)
             speed=speed+BRAKE*delta;
         else
@@ -358,7 +378,7 @@ public class CircuitScreen extends Screen {
         raceTime=0;
         lapTime=0;
         check=false;
-        lapLabel.setText(String.valueOf(lap));
+        lapLabel.setText(String.valueOf(lap+1));
 
         speed = 0;
         aceleration=0;
@@ -370,5 +390,11 @@ public class CircuitScreen extends Screen {
         carActor.setPosition(128*3-carActor.getWidth()/2,128*7-carActor.getHeight()/2);
         stage.getCamera().rotate(new Vector3(0, 0, 1), -carActor.getRotation());
         carActor.setRotation(0);
+
+        for(int i =0;i<checkPoints.size();i++)
+            checkPoints.set(i, 0);
+        //Se pone el ultimo check point como pasado para poder salir de la meta
+        checkPoints.set(checkPoints.size()-1,1);
+        lastCheckPoint=0;
     }
 }

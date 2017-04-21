@@ -11,5 +11,6 @@ Save this file as res/values/games-ids.xml in your project.
     <string name="achievement_veterano">CgkI44j1qYUNEAIQBA</string>
     <string name="achievement_maestro">CgkI44j1qYUNEAIQBQ</string>
     <string name="achievement_leyenda">CgkI44j1qYUNEAIQBg</string>
-    <string name="leaderboard_ranking_3_vueltas">CgkI44j1qYUNEAIQAQ</string>
+    <string name="leaderboard_3_laps">CgkI44j1qYUNEAIQCA</string>
+    <string name="leaderboard_5_laps">CgkI44j1qYUNEAIQCQ</string>
 </resources>

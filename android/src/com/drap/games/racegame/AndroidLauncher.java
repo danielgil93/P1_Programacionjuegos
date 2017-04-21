@@ -124,10 +124,10 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices{
 		{
 			if(nLap==3)
 				Games.Leaderboards.submitScore(gameHelper.getApiClient(),
-						getString(R.string.leaderboard_ranking_3_vueltas), highScore);
-			/*else
+						getString(R.string.leaderboard_3_laps), highScore);
+			else if(nLap==5)
 				Games.Leaderboards.submitScore(gameHelper.getApiClient(),
-						getString(R.string.leaderboard_crazy_high_score), highScore);*/
+						getString(R.string.leaderboard_5_laps), highScore);
 		}
 	}
 
@@ -150,10 +150,10 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices{
 		{
 			if(nLap==3)
 				startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(),
-						getString(R.string.leaderboard_ranking_3_vueltas)), requestCode);
-			/*else
+						getString(R.string.leaderboard_3_laps)), requestCode);
+			else if(nLap==5)
 				startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(),
-						getString(R.string.leaderboard_crazy_high_score)), requestCode);*/
+						getString(R.string.leaderboard_5_laps)), requestCode);
 		}
 		else
 		{

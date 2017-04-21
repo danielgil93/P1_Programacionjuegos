@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -13,9 +15,17 @@ import com.badlogic.gdx.utils.Disposable;
 
 public class RoadActor extends Actor implements Disposable{
     private Texture road;
+    int id;
+    boolean goal;
+    Rectangle bounds;
+    public Polygon polygon;
 
-    public RoadActor(boolean withDir){
-        if(withDir)
+    public RoadActor(int id, boolean goal, boolean withDir){
+        this.id=id;
+        this.goal=goal;
+        if(goal)
+            road = new Texture("goal.png");
+        else if(withDir)
             road = new Texture("road_with_dir.png");
         else
             road = new Texture("road.png");
@@ -23,6 +33,10 @@ public class RoadActor extends Actor implements Disposable{
         setY(0);
         setSize(128*2, 128*2);
         setOrigin(getWidth()/2, getHeight()/2);
+        if(goal)
+            bounds = new Rectangle(getX(),getY()+getHeight()/3,getWidth(),getHeight()/3);
+        else
+            bounds = new Rectangle(getX(),getY()+getHeight(),getWidth(),getHeight());
     }
 
     @Override
@@ -40,5 +54,21 @@ public class RoadActor extends Actor implements Disposable{
     @Override
     public void dispose() {
         road.dispose();
+    }
+    @Override
+    public void setPosition(float x, float y) {
+        super.setPosition(x, y);
+
+        polygon = new Polygon(new float[]{0,0,bounds.getWidth(),0,bounds.getWidth(),
+                bounds.getHeight(),0,bounds.getHeight()});
+        polygon.setScale(getScaleX(),getScaleY());
+        polygon.setPosition(getX(),(goal)?getY()+getHeight()/3:getY());
+    }
+    public int getId() {
+        return id;
+    }
+
+    public boolean isGoal() {
+        return goal;
     }
 }
