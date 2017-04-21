@@ -49,8 +49,8 @@ public class GameOverScreen extends Screen {
         fasterTime = new Label("Faster: "+String.valueOf(game.getFasterTime()), skin);
         fasterTime.setColor(Color.GREEN);
         fasterTime.setFontScale(density * 2);
-        table.add(fasterTime);
-        table.row();
+        //table.add(fasterTime);
+        //table.row();
 
         //game.setGAME_STARTED(false);
         /*game_over = new Label("GAME OVER!", skin);
@@ -59,7 +59,7 @@ public class GameOverScreen extends Screen {
         table.add(game_over);
         table.row();*/
 
-        lastTime = new Label("Time: " + String.valueOf(game.getLastTime()), skin);
+        lastTime = new Label("Time: " + Utils.floatToTime(game.getLastTime()*1000), skin);
         lastTime.setColor(Color.RED);
         lastTime.setFontScale(density * 2);
         table.add(lastTime).colspan(2);
@@ -69,7 +69,7 @@ public class GameOverScreen extends Screen {
         play_again_button.getLabel().setFontScale(density);
         play_again_button.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.restartRace();
+                game.restartRace(game.circuitScreen.getN_LAPS());
                 game.setScreen(game.circuitScreen);
                 //Gdx.input.setCatchBackKey(true);
                 return false;

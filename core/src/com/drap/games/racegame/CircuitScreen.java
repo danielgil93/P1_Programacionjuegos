@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
@@ -13,7 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
@@ -21,7 +23,7 @@ import com.badlogic.gdx.utils.Align;
 import java.util.ArrayList;
 
 /**
- * Created by Juan Antonio on 04/04/2017.
+ * Created by DrAP on 04/04/2017.
  */
 
 public class CircuitScreen extends Screen {
@@ -39,8 +41,13 @@ public class CircuitScreen extends Screen {
     Label timeLabel;
     Label lapLabel;
     Label speedLabel;
+    ArrayList<Label> lapTimeLabels;
     SpriteBatch hudSpriteBatch;
     Skin skin;
+    Texture gasTexture;
+    Texture brakeTexture;
+    Image gasPedal;
+    Image brakePedal;
 
     int N_LAPS=0;
 
@@ -131,23 +138,33 @@ public class CircuitScreen extends Screen {
         speedLabel = new Label(String.valueOf(speed),skin);
         speedLabel.setSize(Gdx.graphics.getWidth(), LABEL_HEIGHT);
         speedLabel.setFontScale(FONT_SCALE);
-        speedLabel.setPosition(0,LABEL_Y);
-        speedLabel.setAlignment(Align.right);
+        speedLabel.setPosition(0,0);
+        speedLabel.setAlignment(Align.center);
         speedLabel.setColor(LABEL_COLOR);
 
         lapLabel = new Label(String.valueOf(lap),skin);
         lapLabel.setSize(Gdx.graphics.getWidth(), LABEL_HEIGHT);
         lapLabel.setFontScale(FONT_SCALE);
         lapLabel.setPosition(0,LABEL_Y);
-        lapLabel.setAlignment(Align.left);
+        lapLabel.setAlignment(Align.right);
         lapLabel.setColor(LABEL_COLOR);
 
         timeLabel = new Label(String.valueOf(lapTime),skin);
         timeLabel.setSize(Gdx.graphics.getWidth(), LABEL_HEIGHT);
         timeLabel.setFontScale(FONT_SCALE);
         timeLabel.setPosition(0,LABEL_Y);
-        timeLabel.setAlignment(Align.center);
+        timeLabel.setAlignment(Align.left);
         timeLabel.setColor(LABEL_COLOR);
+
+        gasTexture = new Texture("gas.png");
+        gasPedal = new Image(new TextureRegion(gasTexture));
+        gasPedal.setSize(Gdx.graphics.getWidth()/10,Gdx.graphics.getHeight()/5);
+        gasPedal.setPosition(Gdx.graphics.getWidth()-(gasPedal.getWidth()*2),0);
+        brakeTexture = new Texture("brake.png");
+        brakePedal = new Image(new TextureRegion(brakeTexture));
+        brakePedal.setSize(Gdx.graphics.getWidth()/10,Gdx.graphics.getHeight()/5);
+        brakePedal.setPosition(brakePedal.getWidth(),0);
+
 
         stage.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -230,11 +247,12 @@ public class CircuitScreen extends Screen {
     public void render(float delta) {
         super.render(delta);
         lapTime+=delta;
+        raceTime+=delta;
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.draw();
         stage.act(delta);
-        timeLabel.setText(String.valueOf(Math.round(lapTime * 100.0) / 100.0));
+        timeLabel.setText(Utils.floatToTime(raceTime*1000));
         //Vector3 relativo= stage.getCamera().unproject(new Vector3(0,Gdx.graphics.getHeight()/2-lapLabel.getHeight(),0));
         //lapLabel.setPosition(relativo.x,relativo.y);
         inputManager(delta);
@@ -276,9 +294,10 @@ public class CircuitScreen extends Screen {
         if (Intersector.overlapConvexPolygons(carActor.polygon, roadActor.get((lastCheckPoint+1)%roadActor.size()).polygon)) {
             lastCheckPoint = (lastCheckPoint + 1) % roadActor.size();
             if(lastCheckPoint==0){
+                lapTimeLabels.get(lap).setText(Utils.floatToTime(lapTime*1000));
                 lap++;
-                lapLabel.setText(String.valueOf(lap+1));
-                raceTime += lapTime;
+                lapLabel.setText(String.valueOf(lap+1)+"/"+N_LAPS);
+                //raceTime += lapTime;
                 lapTime=0;
                 if(lap>=N_LAPS)
                     game.gameOver(N_LAPS,raceTime);
@@ -304,6 +323,10 @@ public class CircuitScreen extends Screen {
         lapLabel.draw(hudSpriteBatch,1);
         timeLabel.draw(hudSpriteBatch,1);
         speedLabel.draw(hudSpriteBatch,1);
+        gasPedal.draw(hudSpriteBatch,1);
+        brakePedal.draw(hudSpriteBatch,1);
+        for(int i=0;i<lapTimeLabels.size();i++)
+            lapTimeLabels.get(i).draw(hudSpriteBatch,1);
         hudSpriteBatch.end();
         //shapeRendererHud.end();
     }
@@ -373,12 +396,23 @@ public class CircuitScreen extends Screen {
         N_LAPS = n_LAPS;
     }
 
-    public void restartRace(){
+    public void restartRace(int n_LAPS){
+        N_LAPS=n_LAPS;
         lap=0;
         raceTime=0;
         lapTime=0;
         check=false;
-        lapLabel.setText(String.valueOf(lap+1));
+        lapLabel.setText(String.valueOf(lap+1)+"/"+N_LAPS);
+        lapTimeLabels = new ArrayList<Label>();
+        for(int i = 0;i<N_LAPS;i++){
+            Label label = new Label("",skin);
+            label.setSize(Gdx.graphics.getWidth(), timeLabel.getHeight()/2);
+            label.setFontScale(timeLabel.getFontScaleX()/2);
+            label.setPosition(0,timeLabel.getY()-label.getHeight()*(i+1));
+            label.setAlignment(Align.left);
+            label.setColor(Color.BLACK);
+            lapTimeLabels.add(label);
+        }
 
         speed = 0;
         aceleration=0;
@@ -396,5 +430,11 @@ public class CircuitScreen extends Screen {
         //Se pone el ultimo check point como pasado para poder salir de la meta
         checkPoints.set(checkPoints.size()-1,1);
         lastCheckPoint=0;
+    }
+
+    @Override
+    public void dispose() {
+        gasTexture.dispose();
+        brakeTexture.dispose();
     }
 }

@@ -59,7 +59,7 @@ public class Game extends com.badlogic.gdx.Game {
 		return lastTime;
 	}
 
-	public void restartRace(){
-		circuitScreen.restartRace();
+	public void restartRace(int n_Laps){
+		circuitScreen.restartRace(n_Laps);
 	}
 }

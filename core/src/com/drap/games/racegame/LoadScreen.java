@@ -117,7 +117,7 @@ public class LoadScreen extends Screen {
         start_3_lap_button.getLabel().setFontScale(density);
         start_3_lap_button.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.restartRace();
+                game.restartRace(3);
                 //game.setGame_mode(GameMode.CLASSIC);
                 game.circuitScreen.setN_LAPS(3);
                 game.setScreen(game.circuitScreen);
@@ -133,7 +133,7 @@ public class LoadScreen extends Screen {
         start_5_lap_button.getLabel().setFontScale(density);
         start_5_lap_button.addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.restartRace();
+                game.restartRace(5);
                 //game.setGame_mode(GameMode.CLASSIC);
                 game.circuitScreen.setN_LAPS(5);
                 game.setScreen(game.circuitScreen);
